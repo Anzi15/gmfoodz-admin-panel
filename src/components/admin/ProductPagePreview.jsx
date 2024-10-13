@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams, Navigate, useLocation } from "react-router-dom";
-import HtmlRenderer from "../HtmlRenderer";
+import HtmlRenderer from "../HtmlRenderer.jsx";
 
 const ProductPagePreview = ({
   primaryImg,

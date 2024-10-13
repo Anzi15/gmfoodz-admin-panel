@@ -36,15 +36,15 @@ function App() {
     <BrowserRouter>
       <ScrollToTop/>
       <Routes>
-        <Route path="/" element={<MainLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path="product/:id" element={<ProductPage />} />
-          <Route path="collection/:collectionName" element={<CollectionPage />} />
-          <Route path="products" element={<AllProductsPage />} />
-          <Route path="contact" element={<ContactPage />} />
-          <Route path="cart" element={<CartPage />} />
+        <Route path="/" element={<AdminLayout />}>
+          <Route index element={<AdminPage />} />
+          {/* <Route path="product/:id" element={<ProductPage />} /> */}
+          {/* <Route path="collection/:collectionName" element={<CollectionPage />} /> */}
+          {/* <Route path="products" element={<AllProductsPage />} /> */}
+          {/* <Route path="contact" element={<ContactPage />} /> */}
+          {/* <Route path="cart" element={<CartPage />} />
           <Route path="about" element={<AboutPage />} />
-          <Route path="/order/confirmed/:orderId/:paymentMethod/:name/:email" element={<OrderConfirmationPage />} />
+          <Route path="/order/confirmed/:orderId/:paymentMethod/:name/:email" element={<OrderConfirmationPage />} /> */}
         </Route>
         <Route path="checkout/:source/:quantity?/:coupon?/:selectedVariantIndex?" element={<EmptyLayout />}>
           <Route index element={<CheckoutPage />}/>
