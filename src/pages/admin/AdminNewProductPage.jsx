@@ -35,8 +35,6 @@ const AdminNewProductPage = () => {
   const [subTitle, setSubTitle] = useState("");
   const [price, setPrice] = useState(0);
   const [comparePrice, setComparePrice] = useState(null);
-  const [discountExpiryDate, setDiscountExpiryDate] = useState(null);
-  const [shippingFees, setShippingFees] = useState(300);
   const [descriptionHtml, setDescriptionHtml] = useState(null);
   const [productSavingType, setProductSavingType] = useState("publish");
   const [selectedTags, setSelectedTags] = useState([]);
@@ -90,66 +88,92 @@ const AdminNewProductPage = () => {
 
   const uploadImage = async (file) => {
     try {
-      // Create a reference to the file in Firebase Storage
-      const storageRef = ref(storage, `images/${ uuidv4()}`);
-      
-      // Create an image element and canvas for resizing
-      const img = document.createElement('img');
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+      const API_KEY = import.meta.env.VITE_IMGBB_API_KEY; // Replace with your ImgBB API key
   
-      return new Promise((resolve, reject) => {
+      console.log("API Key:", API_KEY);
+      if (!API_KEY) throw new Error("ImgBB API key is missing");
+  
+      // Helper function to convert a file or blob to a Base64 string
+      const toBase64 = (file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.split(',')[1]); // Remove "data:image/jpeg;base64,"
+        reader.onerror = reject;
+      });
+  
+      // Helper function to upload to ImgBB
+      const uploadToImgBB = async (base64) => {
+        const formData = new FormData();
+        formData.append("image", base64);
+  
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${API_KEY}`, {
+          method: "POST",
+          body: formData,
+        });
+  
+        const result = await response.json();
+        if (!result.success) throw new Error("ImgBB upload failed: " + result.error.message);
+        return result.data.url;
+      };
+  
+      // Convert the original image to Base64 and upload
+      console.log("Uploading original image...");
+      const originalBase64 = await toBase64(file);
+      const originalUrl = await uploadToImgBB(originalBase64);
+      console.log("Original Image URL:", originalUrl);
+  
+      // Resize and upload thumbnails
+      const sizes = [200, 400, 800];
+      const thumbnailUrls = [];
+  
+      const createThumbnail = (size) => new Promise((resolve, reject) => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const img = document.createElement("img");
+  
         img.onload = async () => {
-          // Upload the original image
-          await uploadBytes(storageRef, file);
-          const originalUrl = await getDownloadURL(storageRef);
+          canvas.width = size;
+          canvas.height = size;
+          ctx.drawImage(img, 0, 0, size, size);
   
-          // Resize and upload thumbnails
-          const sizes = [200, 400, 800];
-          const thumbnailUrls = [];
+          canvas.toBlob(async (blob) => {
+            if (!blob) {
+              console.error(`Failed to create blob for size ${size}`);
+              return reject(`Failed to create blob for size ${size}`);
+            }
   
-          for (const size of sizes) {
-            canvas.width = size;
-            canvas.height = size;
-            ctx.drawImage(img, 0, 0, size, size);
-            
-            // Convert canvas to blob
-            canvas.toBlob(async (blob) => {
-              try {
-                const thumbnailRef = ref(storage, `thumbnails/${size}_${ uuidv4()}`);
-                await uploadBytes(thumbnailRef, blob);
-                const thumbnailUrl = await getDownloadURL(thumbnailRef);
-                thumbnailUrls.push({ size, url: thumbnailUrl });
-  
-                // Resolve when all thumbnails are processed
-                if (thumbnailUrls.length === sizes.length) {
-                  resolve({ originalUrl, thumbnails: thumbnailUrls });
-                }
-              } catch (error) {
-                console.error('Error uploading thumbnail:', error);
-                reject(error);
-              }
-            }, 'image/jpeg');
-          }
-  
-          // Handle case where no thumbnails are generated
-          if (sizes.length === 0) {
-            resolve({ originalUrl, thumbnails: [] });
-          }
+            try {
+              const base64Thumbnail = await toBase64(blob);
+              const thumbnailUrl = await uploadToImgBB(base64Thumbnail);
+              console.log(`Thumbnail (${size}px) URL:`, thumbnailUrl);
+              thumbnailUrls.push({ size, url: thumbnailUrl });
+              resolve();
+            } catch (error) {
+              reject(error);
+            }
+          }, "image/jpeg");
         };
   
         img.onerror = (error) => {
-          console.error('Error loading image:', error);
+          console.error("Error loading image for resizing:", error);
           reject(error);
         };
   
         img.src = URL.createObjectURL(file);
       });
+  
+      // Process all thumbnails in sequence
+      for (const size of sizes) {
+        await createThumbnail(size);
+      }
+  
+      return { originalUrl, thumbnails: thumbnailUrls };
     } catch (error) {
       console.error("Error uploading file:", error);
       throw error;
     }
   };
+  
   
 
   const handleFileChange = async (event) => {
@@ -184,7 +208,7 @@ const AdminNewProductPage = () => {
 
   const handleFormSubmission = async (e) => {
     e.preventDefault();
-    if (!primaryImg || !secondary1Img || !secondary2Img) {
+    if (!primaryImg && !secondary1Img && !secondary2Img) {
       toast.error("Upload All Images!", {
         position: "top-right",
         autoClose: 5000,
@@ -195,34 +219,58 @@ const AdminNewProductPage = () => {
         progress: undefined,
         theme: "light",
       });
-    } else {
+    }
+     else {
       setPublishing(true);
-      const primaryImgUrl = await uploadImage(primaryImg);
-      setPublishingMsg("Uploading Img 1/3..");
-      const secondary1ImgUrl = await uploadImage(secondary1Img);
-      setPublishingMsg("Uploading Img 2/3..");
-      const secondary2ImgUrl = await uploadImage(secondary2Img);
-      setPublishingMsg("Uploading Img 3/3..");
 
-      const productData = {
-        primaryImg: primaryImgUrl.originalUrl,
-        primaryImgThumbnails: primaryImgUrl.thumbnails,
-        secondary1Img: secondary1ImgUrl.originalUrl,
-        secondary1ImgThumbnails: secondary1ImgUrl.thumbnails,
-        secondary2Img: secondary2ImgUrl.originalUrl,
-        secondary2ImgThumbnails: secondary2ImgUrl.thumbnails,
-        title,
-        subTitle,
-        descriptionHtml,
-        price,
-        comparePrice,
-        discountExpiryDate,
-        createdAt: Timestamp.now(),
-        tags: selectedTags,
-        variants,
-        shippingFees
-      };
+// If primaryImg is missing, assign it from secondary1Img or secondary2Img
+if (!primaryImg) {
+  if (secondary1Img) {
+    primaryImg = secondary1Img;
+    secondary1Img = null;
+  } else if (secondary2Img) {
+    primaryImg = secondary2Img;
+    secondary2Img = null;
+  }
+}
 
+// If primaryImg is present but secondary1Img is missing, move secondary2Img to secondary1Img
+
+if (primaryImg && !secondary1Img && secondary2Img) {
+  secondary1Img = secondary2Img;
+  secondary2Img = null;
+}
+
+setPublishingMsg("Uploading image")
+const primaryImgUrl = await uploadImage(primaryImg);
+setPublishingMsg("Uploading Img 1/3..");
+
+setPublishingMsg("Uploading image 2")
+
+const secondary1ImgUrl = secondary1Img ? await uploadImage(secondary1Img) : null;
+setPublishingMsg("Uploading Img 3");
+
+const secondary2ImgUrl = secondary2Img ? await uploadImage(secondary2Img) : null;
+
+setPublishingMsg("Connecting to database")
+
+
+const productData = {
+  primaryImg: primaryImgUrl.originalUrl,
+  primaryImgThumbnails: primaryImgUrl.thumbnails,
+  secondary1Img: secondary1ImgUrl ? secondary1ImgUrl.originalUrl : null,
+  secondary1ImgThumbnails: secondary1ImgUrl ? secondary1ImgUrl.thumbnails : null,
+  secondary2Img: secondary2ImgUrl ? secondary2ImgUrl.originalUrl : null,
+  secondary2ImgThumbnails: secondary2ImgUrl ? secondary2ImgUrl.thumbnails : null,
+  title,
+  subTitle,
+  descriptionHtml,
+  price,
+  comparePrice,
+  createdAt: Timestamp.now(),
+  tags: selectedTags,
+  variants,
+};
       try {
         setPublishingMsg("Connecting to database..");
         const collectionName =
@@ -329,15 +377,7 @@ const AdminNewProductPage = () => {
                 requiredInput={false}
                 inputValue={comparePrice}
               />
-              <DatePicker dateReturner={setDiscountExpiryDate} mode="datetime" label="Discount Expire Time (optional - no expiry by default)" />
 
-              <InputField
-                inputName={"Shipping Fees"}
-                inputType="number"
-                valueReturner={setShippingFees}
-                requiredInput={true}
-                inputValue={shippingFees}
-              />
 
               <div className="max-w-full">
                 <TiptapEditor updateHtml={setDescriptionHtml} />
@@ -470,16 +510,6 @@ const AdminNewProductPage = () => {
               >
                 <GoGoal className="text-2xl" />
                 Publish
-              </button>
-              <button
-                className="align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 px-6 rounded-lg border border-gray-900 text-gray-900 hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] flex items-center gap-3"
-                type="submit"
-                onClick={() => {
-                  setProductSavingType("archive");
-                }}
-              >
-                Archive
-                <MdOutlineArchive className="text-2xl" />
               </button>
             </div>
           </form>
