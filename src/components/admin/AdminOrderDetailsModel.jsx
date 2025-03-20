@@ -4,6 +4,8 @@ import ProductCard from "../ProductCard"
 const OrderDetailsModal = ({ orderDetails, onClose }) => {
   if (!orderDetails) return null;
 
+    console.log(orderDetails)
+
   return (
     <div
       id="orderDetailsModal"
@@ -15,7 +17,7 @@ const OrderDetailsModal = ({ orderDetails, onClose }) => {
         {/* Modal header */}
         <div className="flex justify-between items-center pb-4 mb-4 rounded-t border-b dark:border-gray-600">
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Order #{orderDetails.orderId}
+            Order #{orderDetails.id}
           </h3>
           <button
             type="button"
@@ -152,13 +154,13 @@ const OrderDetailsModal = ({ orderDetails, onClose }) => {
                     {
                         orderDetails.items.map((item)=>{
                             return(
-                                <div className='flex gap-4' key={item.data.title}> 
+                                <div className='flex gap-4' key={item.product.title}> 
                                     <div>
-                                        <img src={item.data.primaryImgThumbnails[0].url}alt={item.data.title} className='h-20 rounded skeleton-loading aspect-square' />
+                                        <img src={item.product?.primaryImg}alt={item.product.title} className='h-20 rounded skeleton-loading aspect-square' />
                                     </div>
                                     <div>
                                         <h3 className='text-xl'>
-                                            {item.data.title}
+                                            {item.product?.title}
                                         </h3>
                                         <h4>
                                            x  {item.quantity}

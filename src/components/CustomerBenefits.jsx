@@ -10,8 +10,8 @@ const CustomerBenefits = () => {
         <FiTruck className="text-5xl" />
         <h2 className="text-xl font-bold">Free Doorstep Delivery</h2>
         <p className="max-w-[70%]">
-          Enjoy the convenience of having your favorite perfumes delivered to
-          your doorstep across all major cities in Pakistan.
+          Enjoy the convenience of having your favorite achars delivered to your
+          doorstep across all major cities in Pakistan.
         </p>
       </div>
       <div className="flex min-w-full md:min-w-[20%] flex-col items-center text-center text-brandBrown gap-4 snap-center">
@@ -26,7 +26,7 @@ const CustomerBenefits = () => {
         <TfiWorld className="text-5xl font-thin" />
         <h2 className="text-xl font-bold">Global Quality Standards</h2>
         <p className="max-w-[70%]">
-          Our perfumes are crafted locally but meet international standards,
+          Our achars are crafted locally but meet international standards,
           ensuring you receive the finest quality every time.
         </p>
       </div>

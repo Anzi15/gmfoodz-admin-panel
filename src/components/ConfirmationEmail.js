@@ -48,41 +48,44 @@ const ConfirmationEmail = (email, name) => {
         
         <p>Your order will arrive in 3-5 working days. If you have any questions or need further assistance, please do not hesitate to contact us.</p>
         <p>Thank you for shopping with us!</p>
-        <p>Best regards,<br>Al Zehra Perfumes</p>
+        <p>Best regards,<br>Gm foods achars</p>
         <div class="footer">
             <p>If you did not place this order, please contact our support team immediately.</p>
-            <p>Al Zehra Perfumes<br>Main Lakhi der, shikarpur, sindh pakistan<br>+92 332 3947336<br>info@alzehrabygm.store</p>
+            <p>Gm foods achars<br>Main Lakhi der, shikarpur, sindh pakistan<br>+92 332 3947336<br>info@alzehrabygm.store</p>
         </div>
     </div>
 </body>
-</html>`
+</html>`,
   };
-  
+
   // Define the request options
   const requestOptions = {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify(emailData)
+    body: JSON.stringify(emailData),
   };
-  
+
   // Perform the fetch request
-  fetch('https://alzehrareact.netlify.app/.netlify/functions/sendEmail', requestOptions)
-    .then(response => {
+  fetch(
+    "https://alzehrareact.netlify.app/.netlify/functions/sendEmail",
+    requestOptions
+  )
+    .then((response) => {
       if (!response.ok) {
-        console.error('Network response was not ok');
+        console.error("Network response was not ok");
       }
       return response.json();
     })
-    .then(data => {
-      console.log('Success:', data);
-      return ('Success:', data)
+    .then((data) => {
+      console.log("Success:", data);
+      return "Success:", data;
     })
-    .catch(error => {
-      console.error('Error:', error);
-      return ('Error:', error);
-    });;
+    .catch((error) => {
+      console.error("Error:", error);
+      return "Error:", error;
+    });
 };
 
 export default ConfirmationEmail;

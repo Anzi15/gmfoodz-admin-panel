@@ -61,7 +61,7 @@ const AdminOrderCard = ({
       </tr>
       {isModalOpen && (
         <OrderDetailsModal 
-          orderDetails={orderDetails} // Use updated state
+          orderDetails={orderDetailsObj} // Use updated state
           onClose={closeModal} 
         />
       )}

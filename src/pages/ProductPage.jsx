@@ -14,44 +14,46 @@ import Testimonials from "../components/Testimonials.jsx";
 import { toast } from "react-toastify";
 import ProductImgsCarousel from "../components/ProductImgsCarousel";
 import MobileCarousel from "../components/MobileCarousel.jsx";
-import CountdownTimer, { formatRemainingTime } from "../components/CountDownTimer.jsx";
+import CountdownTimer, {
+  formatRemainingTime,
+} from "../components/CountDownTimer.jsx";
 import { Button } from "@material-tailwind/react";
 import { IoMdCart } from "react-icons/io";
 import { Helmet } from "react-helmet-async";
 const reviews = [
   {
     stars: 5,
-    text: "I was really impressed with the timely delivery and good packaging of my order from Al Zehra By GM. The product was delivered on the promised date and was well-protected during shipping.",
+    text: "I was really impressed with the timely delivery and good packaging of my order from Gm foods By GM. The product was delivered on the promised date and was well-protected during shipping.",
     author: "Saad Arain",
   },
   {
     stars: 5,
-    text: "I have been a customer of Al Zehra by GM for many years and I have always been happy with the service. The order is always delivered on time and is packaged well. They do a great job of assisting to get the perfect fragrance for their loved ones.",
+    text: "I have been a customer of Gm foods by GM for many years and I have always been happy with the service. The order is always delivered on time and is packaged well. They do a great job of assisting to get the perfect fragrance for their loved ones.",
     author: "Rahat Raja",
   },
   {
     stars: 5,
-    text: "I had a great experience shopping with Al Zehra by GM. The shopping experience was a breeze and the product quality was excellent. their team asked the next day for reviews of the perfume. Great service.",
+    text: "I had a great experience shopping with Gm foods by GM. The shopping experience was a breeze and the product quality was excellent. their team asked the next day for reviews of the perfume. Great service.",
     author: "Waqas Ashraf",
   },
   {
     stars: 5,
-    text: "The scent collection at Al Zehra by GM is absolutely amazing. I ordered a few perfumes, and each one exceeded my expectations. The customer support was very responsive and helped me choose the best fragrances for my needs. Highly recommended!",
+    text: "The scent collection at Gm foods by GM is absolutely amazing. I ordered a few achars, and each one exceeded my expectations. The customer support was very responsive and helped me choose the best fragrances for my needs. Highly recommended!",
     author: "Fatima Malik",
   },
   {
     stars: 4,
-    text: "I ordered a perfume from Al Zehra by GM, and while the delivery took a bit longer than expected, the quality of the fragrance made up for it. I will definitely be ordering again. The scent is long-lasting and exactly what I was looking for.",
+    text: "I ordered a perfume from Gm foods by GM, and while the delivery took a bit longer than expected, the quality of the fragrance made up for it. I will definitely be ordering again. The scent is long-lasting and exactly what I was looking for.",
     author: "Ahmed Khan",
   },
   {
     stars: 5,
-    text: "Al Zehra by GM never disappoints! The perfumes are of top-notch quality, and the prices are very reasonable. I’ve recommended this store to all my friends, and they love it too. Great job!",
+    text: "Gm foods by GM never disappoints! The achars are of top-notch quality, and the prices are very reasonable. I’ve recommended this store to all my friends, and they love it too. Great job!",
     author: "Sara Sheikh",
   },
   {
     stars: 5,
-    text: "I recently purchased a gift set from Al Zehra by GM, and it was beautifully packaged and delivered on time. The recipient loved the fragrance. I'll definitely be coming back for more.",
+    text: "I recently purchased a gift set from Gm foods by GM, and it was beautifully packaged and delivered on time. The recipient loved the fragrance. I'll definitely be coming back for more.",
     author: "Naveed Anwar",
   },
 ];
@@ -83,10 +85,14 @@ const ProductPage = () => {
     ],
     price: "0.00",
     comparePrice: "2000",
-    discountExpiryDate: null
+    discountExpiryDate: null,
   });
 
-  const [selectedVariant, setSelectedVariant] = useState({price: 20, comparePrice: 30, name:"meow"});
+  const [selectedVariant, setSelectedVariant] = useState({
+    price: 20,
+    comparePrice: 30,
+    name: "meow",
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const { id: productId } = useParams();
@@ -157,30 +163,42 @@ const ProductPage = () => {
   if (error) {
     return <Navigate to="/" />;
   }
-  useEffect(()=>{
-    if(isLoading) return;
-    const expiryDateValid = data.expiryDateValid ? true : formatRemainingTime(data.discountExpiryDate) !== "00:00:00" && true;
-    setIsExpiryDateValid(expiryDateValid)
-  },[data.discountExpiryDate])
+  useEffect(() => {
+    if (isLoading) return;
+    const expiryDateValid = data.expiryDateValid
+      ? true
+      : formatRemainingTime(data.discountExpiryDate) !== "00:00:00" && true;
+    setIsExpiryDateValid(expiryDateValid);
+  }, [data.discountExpiryDate]);
   const parsePrice = (price) => {
     const parsed = parseFloat(price);
     return isNaN(parsed) ? 0 : parsed;
   };
 
-  useEffect(()=>{
-    if(isLoading) return;
-    console.log(data.comparePrice, selectedVariant.comparePrice)
-    if(parsePrice(selectedVariant?.comparePrice || parsePrice(data?.comparePrice))){
-      if((parsePrice(selectedVariant?.comparePrice) !== 0) || (parsePrice(data.comparePrice) !== 0)){
-          setShouldShowComparePrice(true)
+  useEffect(() => {
+    if (isLoading) return;
+    console.log(data.comparePrice, selectedVariant.comparePrice);
+    if (
+      parsePrice(
+        selectedVariant?.comparePrice || parsePrice(data?.comparePrice)
+      )
+    ) {
+      if (
+        parsePrice(selectedVariant?.comparePrice) !== 0 ||
+        parsePrice(data.comparePrice) !== 0
+      ) {
+        setShouldShowComparePrice(true);
       }
     }
-  },[data.comparePrice, selectedVariant.comparePrice])
+  }, [data.comparePrice, selectedVariant.comparePrice]);
 
   return (
     <>
-    <Helmet>
-        <title>{data.title !== "Loading..." ? data.title : "Best fragrances" } | Al Zehra By GM</title>
+      <Helmet>
+        <title>
+          {data.title !== "Loading..." ? data.title : "Best fragrances"} | Gm
+          foods By GM
+        </title>
         <meta name="description" content={data.description} />
       </Helmet>
       <main className="flex justify-evenly w-full md:flex-row flex-col relative h-full">
@@ -386,7 +404,12 @@ const ProductPage = () => {
                 <IoMdCart className="text-xl" />
                 <p className="hidden md:flex">Add To Cart</p>
               </Button>
-              <Link to={`/checkout/${productId}/${quantity}/none/${data?.variants?.indexOf(selectedVariant)}`} className="w-full">
+              <Link
+                to={`/checkout/${productId}/${quantity}/none/${data?.variants?.indexOf(
+                  selectedVariant
+                )}`}
+                className="w-full"
+              >
                 <Button className="w-full py-3.5 text-lg">Buy now</Button>
               </Link>
 
@@ -555,7 +578,7 @@ const ProductPage = () => {
           </h1>
           <p className="text-left md:w-[80%]">
             Experience the harmony of elegance and practicality with our curated
-            selection of signature perfumes. Each scent is crafted to offer a
+            selection of signature achars. Each scent is crafted to offer a
             unique sensory journey while complementing your personal style and
             enhancing your daily presence.
           </p>
@@ -583,7 +606,7 @@ const ProductPage = () => {
           </h1>
           <p className="text-left md:w-[80%]">
             Transform your daily routine into a luxurious experience with our
-            premium collection of perfumes. Crafted with the finest ingredients,
+            premium collection of achars. Crafted with the finest ingredients,
             each scent embodies elegance and sophistication, making it the
             perfect companion for any occasion.
           </p>
@@ -598,7 +621,7 @@ const ProductPage = () => {
           <p className="text-left md:w-[80%]">
             Discover the art of self-expression with our captivating range of
             fragrances. Whether you prefer the allure of a floral bouquet or the
-            depth of a woody aroma, our perfumes are designed to leave a lasting
+            depth of a woody aroma, our achars are designed to leave a lasting
             impression, effortlessly enhancing your presence.
           </p>
         </div>

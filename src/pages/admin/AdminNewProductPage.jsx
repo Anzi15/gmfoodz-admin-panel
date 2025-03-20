@@ -48,6 +48,10 @@ const AdminNewProductPage = () => {
   ]);
 
   useEffect(() => {
+    console.log(variants[0].comparePrice)
+  }, [variants]);
+
+  useEffect(() => {
     setDocId(title.toLowerCase().replace(/ /g, "-"));
     const checkForExistence = async () => {
       if (title.length) {
@@ -173,7 +177,6 @@ const AdminNewProductPage = () => {
       throw error;
     }
   };
-  
   
 
   const handleFileChange = async (event) => {

@@ -34,7 +34,7 @@ module.exports.handler = async (event) => {
   const { toEmail, subject, textContent, htmlContent } = JSON.parse(event.body);
 
   const emailData = {
-    from: "AL ZEHRA PERFUMES <noreply@alzehrabygm.store>",
+    from: "Gm foods achars <noreply@alzehrabygm.store>",
     to: toEmail,
     subject: subject,
     text: textContent,
@@ -54,7 +54,9 @@ module.exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ message: `Failed to send email. Error: ${error.message}` }),
+      body: JSON.stringify({
+        message: `Failed to send email. Error: ${error.message}`,
+      }),
     };
   }
 };

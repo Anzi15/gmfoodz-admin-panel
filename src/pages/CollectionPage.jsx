@@ -5,7 +5,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { IoIosOptions } from "react-icons/io";
 import { useNavigate, useParams } from "react-router-dom";
 
-const PAGE_SIZE = 12; 
+const PAGE_SIZE = 12;
 
 const CollectionPage = () => {
   const { collectionName: collectionName } = useParams();
@@ -15,15 +15,14 @@ const CollectionPage = () => {
   const [initialLoading, setInitialLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [sortOrder, setSortOrder] = useState("title"); // Default sort by title
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [filterTag, setFilterTag] = useState(collectionName); // Default no filter
   const loader = useRef(null);
 
-  useEffect(()=>{
-    console.log(products.length < 1)
-    if(!initialLoading && products.length < 1) navigate("/")
-
-  },[products])
+  useEffect(() => {
+    console.log(products.length < 1);
+    if (!initialLoading && products.length < 1) navigate("/");
+  }, [products]);
 
   useEffect(() => {
     loadMoreProducts();
@@ -52,7 +51,6 @@ const CollectionPage = () => {
 
   const loadMoreProducts = async () => {
     setLoading(true);
-
 
     try {
       const productsData = await loadProductsWithPagination(
@@ -108,7 +106,9 @@ const CollectionPage = () => {
     <main>
       <div>
         <div className="px-8 flex w-full justify-between items-center ">
-          <h1 className="text-[3rem] py-4 text-left uppercase -">{collectionName}</h1>
+          <h1 className="text-[3rem] py-4 text-left uppercase -">
+            {collectionName}
+          </h1>
           <Menu as="div" className="relative inline-block text-left">
             <div>
               <MenuButton className="inline-flex items-center gap-2 w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
@@ -139,10 +139,10 @@ const CollectionPage = () => {
                 </MenuItem>
                 <MenuItem>
                   <button
-                    onClick={() => handleFilterChange("Perfumes")}
+                    onClick={() => handleFilterChange("achars")}
                     className="block px-4 py-2 text-sm text-gray-700"
                   >
-                    Filter by Perfumes
+                    Filter by achars
                   </button>
                 </MenuItem>
                 <MenuItem>

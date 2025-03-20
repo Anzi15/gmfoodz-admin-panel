@@ -6,7 +6,7 @@ import { IoCheckmarkSharp } from "react-icons/io5";
 import PromoCodeForm from "../components/PromoCodeForm";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { useNavigate, useParams } from "react-router-dom";
-import { Timestamp } from 'firebase/firestore'; 
+import { Timestamp } from "firebase/firestore";
 import { quality } from "@cloudinary/url-gen/actions/delivery";
 import {
   setDoc,
@@ -16,7 +16,7 @@ import {
   query,
   where,
   getDocs,
-  updateDoc
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../modules/firebase-modules/firestore";
 import { FaSmileWink } from "react-icons/fa";
@@ -54,7 +54,8 @@ const paymentMethods = [
   {
     icon: bankIcon,
     name: "Bank Transfer",
-    context: "Send your payment to this IBAN number:  <a class='text-light-blue-800' href='https://wa.me/923323947336?text=Hi, please guide me i want to pay using bank transfer for a order on your website' target='_blank'>PK05 BAHL 1252 0981 0005 9601</a>",
+    context:
+      "Send your payment to this IBAN number:  <a class='text-light-blue-800' href='https://wa.me/923323947336?text=Hi, please guide me i want to pay using bank transfer for a order on your website' target='_blank'>PK05 BAHL 1252 0981 0005 9601</a>",
     identifier: "BT",
   },
 ];
@@ -208,7 +209,7 @@ const CheckoutPage = () => {
       ],
       shippingFees,
       grandTotal: total,
-      ConfirmationEmailSent: false
+      ConfirmationEmailSent: false,
     };
 
     try {
@@ -218,39 +219,40 @@ const CheckoutPage = () => {
           collection(db, "coupons"),
           where("couponCode", "==", couponCodeApplied)
         );
-    
+
         const querySnapshot = await getDocs(q);
-        
+
         if (!querySnapshot.empty) {
           // Assuming there's only one document with this couponCode
           const docRef = doc(db, "coupons", querySnapshot.docs[0].id);
           const docSnap = querySnapshot.docs[0];
-        
+
           const docSnapData = docSnap.data();
           console.warn(docSnapData);
-        
+
           // Increment the usedCount field
           const updatedUsedCount = (docSnapData.usedCount || 0) + 1;
-          
+
           console.log({ ...docSnapData, usedCount: updatedUsedCount });
-          
+
           // Update the document with the new usedCount
           await updateDoc(docRef, {
-            usedCount: updatedUsedCount
+            usedCount: updatedUsedCount,
           });
         } else {
           console.warn("No document found with the specified couponCode");
         }
       }
-      if(source == "cart") localStorage.removeItem("cart-items");
-      toast.success("Your order has been placed")
-      navigate(`/order/confirmed/${orderData.orderId}/${orderData.payment.method}/${orderData.customer.firstName}/${orderData.customer.email}`)
+      if (source == "cart") localStorage.removeItem("cart-items");
+      toast.success("Your order has been placed");
+      navigate(
+        `/order/confirmed/${orderData.orderId}/${orderData.payment.method}/${orderData.customer.firstName}/${orderData.customer.email}`
+      );
     } catch (error) {
-      console.log("there a error")
+      console.log("there a error");
       console.log(error);
-      success= false
+      success = false;
     } finally {
-      
     }
   };
 
@@ -434,7 +436,7 @@ const CheckoutPage = () => {
                     <img className="w-[7rem] skeleton-loading aspect-square rounded" />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <h3 className="skeleton-loading">Best Perfumes</h3>
+                    <h3 className="skeleton-loading">Best achars</h3>
                     <h4 className="text-gray-600 skeleton-loading w-fit">
                       Rs. 1500
                     </h4>
@@ -543,7 +545,11 @@ const CheckoutPage = () => {
                     </div>} */}
               </div>
             </div>
-            <div className={`py-8 md:block w-full ${isSummaryExpanded ? "flex " : "hidden"}`}>
+            <div
+              className={`py-8 md:block w-full ${
+                isSummaryExpanded ? "flex " : "hidden"
+              }`}
+            >
               <PromoCodeForm
                 productTags={allProductTags}
                 discountValueReturner={getDiscountValue}

@@ -196,76 +196,88 @@ const AdminEditProductPage = () => {
   const [openTab, setOpenTab] = useState(1);
 
 
-
-  const uploadImage = async (file, oldFileUrl) => {
+  const uploadImage = async (file) => {
     try {
-      const uid=  uuidv4()
-      // Create a reference to the file in Firebase Storage
-      const storageRef = ref(storage, `images/${uid}`);
-      
-      // If there's an old file URL, delete the old file
-      if (oldFileUrl) {
-        const oldFileRef = ref(storage, oldFileUrl);
-        try {
-          await deleteObject(oldFileRef);
-          console.log(`Old file deleted: ${oldFileUrl}`);
-        } catch (error) {
-          console.error("Error deleting old file:", error);
-        }
-      }
+      const API_KEY = import.meta.env.VITE_IMGBB_API_KEY; // Replace with your ImgBB API key
   
-      // Create an image element and canvas for resizing
-      const img = document.createElement('img');
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+      console.log("API Key:", API_KEY);
+      if (!API_KEY) throw new Error("ImgBB API key is missing");
   
-      return new Promise((resolve, reject) => {
+      // Helper function to convert a file or blob to a Base64 string
+      const toBase64 = (file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.split(',')[1]); // Remove "data:image/jpeg;base64,"
+        reader.onerror = reject;
+      });
+  
+      // Helper function to upload to ImgBB
+      const uploadToImgBB = async (base64) => {
+        const formData = new FormData();
+        formData.append("image", base64);
+  
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${API_KEY}`, {
+          method: "POST",
+          body: formData,
+        });
+  
+        const result = await response.json();
+        if (!result.success) throw new Error("ImgBB upload failed: " + result.error.message);
+        return result.data.url;
+      };
+  
+      // Convert the original image to Base64 and upload
+      console.log("Uploading original image...");
+      const originalBase64 = await toBase64(file);
+      const originalUrl = await uploadToImgBB(originalBase64);
+      console.log("Original Image URL:", originalUrl);
+  
+      // Resize and upload thumbnails
+      const sizes = [200, 400, 800];
+      const thumbnailUrls = [];
+  
+      const createThumbnail = (size) => new Promise((resolve, reject) => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const img = document.createElement("img");
+  
         img.onload = async () => {
-          // Upload the original image
-          await uploadBytes(storageRef, file);
-          const originalUrl = await getDownloadURL(storageRef);
+          canvas.width = size;
+          canvas.height = size;
+          ctx.drawImage(img, 0, 0, size, size);
   
-          // Resize and upload thumbnails
-          const sizes = [200, 400, 800];
-          const thumbnailUrls = [];
+          canvas.toBlob(async (blob) => {
+            if (!blob) {
+              console.error(`Failed to create blob for size ${size}`);
+              return reject(`Failed to create blob for size ${size}`);
+            }
   
-          for (const size of sizes) {
-            canvas.width = size;
-            canvas.height = size;
-            ctx.drawImage(img, 0, 0, size, size);
-  
-            // Convert canvas to blob
-            canvas.toBlob(async (blob) => {
-              try {
-                const thumbnailRef = ref(storage, `thumbnails/${size}_${file.name}`);
-                await uploadBytes(thumbnailRef, blob);
-                const thumbnailUrl = await getDownloadURL(thumbnailRef);
-                thumbnailUrls.push({ size, url: thumbnailUrl });
-  
-                // Resolve when all thumbnails are processed
-                if (thumbnailUrls.length === sizes.length) {
-                  resolve({ originalUrl, thumbnails: thumbnailUrls });
-                }
-              } catch (error) {
-                console.error('Error uploading thumbnail:', error);
-                reject(error);
-              }
-            }, 'image/jpeg');
-          }
-  
-          // Handle case where no thumbnails are generated
-          if (sizes.length === 0) {
-            resolve({ originalUrl, thumbnails: [] });
-          }
+            try {
+              const base64Thumbnail = await toBase64(blob);
+              const thumbnailUrl = await uploadToImgBB(base64Thumbnail);
+              console.log(`Thumbnail (${size}px) URL:`, thumbnailUrl);
+              thumbnailUrls.push({ size, url: thumbnailUrl });
+              resolve();
+            } catch (error) {
+              reject(error);
+            }
+          }, "image/jpeg");
         };
   
         img.onerror = (error) => {
-          console.error('Error loading image:', error);
+          console.error("Error loading image for resizing:", error);
           reject(error);
         };
   
         img.src = URL.createObjectURL(file);
       });
+  
+      // Process all thumbnails in sequence
+      for (const size of sizes) {
+        await createThumbnail(size);
+      }
+  
+      return { originalUrl, thumbnails: thumbnailUrls };
     } catch (error) {
       console.error("Error uploading file:", error);
       throw error;
@@ -318,15 +330,15 @@ const AdminEditProductPage = () => {
     );
     const primaryImgUpdated = initialPrimaryImg === primaryImg
     ? data.primaryImg
-    : await uploadImage(primaryImg, data.primaryImg);
+    : await uploadImage(primaryImg);
   
   const secondary1ImgUpdated = initialSecondary1Img === secondary1Img
     ? data.secondary1Img
-    : await uploadImage(secondary1Img, data.secondary1Img);
+    : await uploadImage(secondary1Img);
   
   const secondary2ImgUpdated = initialSecondary2Img === secondary2Img
     ? data.secondary2Img
-    : await uploadImage(secondary2Img, data.secondary2Img);
+    : await uploadImage(secondary2Img);
     console.log(discountExpiryDate)
     const updatedData = {
       title,

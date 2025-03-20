@@ -128,10 +128,10 @@ const ProductsPage = () => {
               </MenuItem>
               <MenuItem>
                 <button
-                  onClick={() => handleFilterChange("Perfumes")}
+                  onClick={() => handleFilterChange("achars")}
                   className="block px-4 py-2 text-sm text-gray-700"
                 >
-                  Filter by Perfumes
+                  Filter by achars
                 </button>
               </MenuItem>
               <MenuItem>
